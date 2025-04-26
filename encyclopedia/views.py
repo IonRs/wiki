@@ -5,15 +5,18 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 import re
 from random import choice
+import markdown2
 
 class SearchForm(forms.Form):
     entry = forms.CharField(label = "Search")
+class EditPage(forms.Form):
+    content = forms.CharField(label = "Edit Markdown content", widget=forms.Textarea())
 class CreatePage(forms.Form):
     title = forms.CharField(label = "Title")
     content = forms.CharField(label = "Markdown content", widget=forms.Textarea(attrs={
             'placeholder': 'Enter your content'
         })
-)
+    )
 def index(request):
     return render(request, "encyclopedia/index.html", {
         "form": SearchForm(),
@@ -26,7 +29,8 @@ def create(request):
         if form.is_valid():
             if form.cleaned_data["title"].lower() in util.list_entries():
                 return render(request, "encyclopedia/error.html", {
-                    "form": SearchForm()
+                    "form": SearchForm(),
+                    "error": f"{form.cleaned_data['title']} entry already exists!"
                 })
             else:
                 util.save_entry(form.cleaned_data["title"], form.cleaned_data["content"])
@@ -38,6 +42,18 @@ def create(request):
     return render(request, "encyclopedia/create.html", {
         "form": SearchForm(),
         "create": CreatePage()
+    })
+
+def edit(request):
+    if request.method == "POST":
+        form = EditPage(request.POST)
+        if form.is_valid():
+            title = request.POST.get('title', 'no')
+            with open(f"/entries/{title}.md", 'w') as file:
+                file.write(form.cleaned_data["content"])
+    return render(request, "encyclopedia/edit.html",{
+        "form": SearchForm(),
+        "edit": EditPage(initial={'content': 'XYZ'})
     })
 
 def entry(request, TITLE):
@@ -66,8 +82,13 @@ def entry(request, TITLE):
             return render(request, "encyclopedia/index.html", {
                 "form": form
             })
+    if util.get_entry(TITLE) == None:
+        return render(request, "encyclopedia/error.html", {
+            "form": SearchForm(),
+            "error": f"{TITLE} does not exist!"
+        })
     return render(request, "encyclopedia/entry.html",{
         "title": TITLE.upper(),
-        "content": util.get_entry(TITLE),
+        "content": markdown2.markdown(util.get_entry(TITLE)),
         "form": SearchForm()
     })

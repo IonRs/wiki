@@ -1,17 +1,15 @@
 {% extends "encyclopedia/layout.html" %}
 
 {% block title %}
-    {% if content == None %}
-        Error
-    {% else %}
-        {{ title }}
-    {% endif %}
+    {{ title }}
 {% endblock %}
 
 {% block body %}
-    {% if content == None %}
-        <h1>"{{ title }}" entry does not exist!</h1>
-    {% else %}
-        <p>{{ content }}</p>
-    {% endif %}
+    <form action="{% url 'wiki:edit' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" value="{{ title }}" name="title">
+        <input type="submit" value="Edit">
+    </form>
+    <hr>
+    {{ content|safe }}
 {% endblock %}
