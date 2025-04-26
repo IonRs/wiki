@@ -4,6 +4,7 @@ from . import util
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 import re
+from random import choice
 
 class SearchForm(forms.Form):
     entry = forms.CharField(label = "Search")
@@ -40,6 +41,8 @@ def create(request):
     })
 
 def entry(request, TITLE):
+    if TITLE == "random":
+        return HttpResponseRedirect(reverse("wiki:entry", args=[choice(util.list_entries())]))
     if request.method == "POST":
         form = SearchForm(request.POST)
         if form.is_valid():
