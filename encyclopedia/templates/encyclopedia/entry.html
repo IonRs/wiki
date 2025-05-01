@@ -5,11 +5,10 @@
 {% endblock %}
 
 {% block body %}
-    <form action="{% url 'wiki:edit' %}" method="post">
+    <form action="{% url 'wiki:edit' title %}" method="post">
         {% csrf_token %}
-        <input type="hidden" value="{{ title }}" name="title">
         <input type="submit" value="Edit">
     </form>
     <hr>
-    {{ content|safe }}
+    {{ content | safe }}
 {% endblock %}
