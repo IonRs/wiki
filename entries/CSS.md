@@ -22,13 +22,3 @@ Love**is**bold
 Use `code` in your Markdown file.
 
 ~~The world is flat.~~ We now know that the world is round.
-
-> Dorothy followed her through many of the beautiful rooms in her castle.
-
-ds
-
-
-
-
-
-ds

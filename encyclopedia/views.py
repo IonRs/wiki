@@ -59,9 +59,14 @@ def edit(request, TITLE):
         "edit": EditPage(initial={'content': util.get_entry(TITLE)}),
     })
 
+def random(request, TITLE):
+    entries = util.list_entries()
+    if TITLE.lower() == 'null':
+        return HttpResponseRedirect(reverse("wiki:entry", args=[choice(entries)]))
+    entries.remove(TITLE.lower())
+    return HttpResponseRedirect(reverse("wiki:entry", args=[choice(entries)]))
+
 def entry(request, TITLE):
-    if TITLE == "random":
-        return HttpResponseRedirect(reverse("wiki:entry", args=[choice(util.list_entries())]))
     if request.method == "POST":
         form = SearchForm(request.POST)
         if form.is_valid():
